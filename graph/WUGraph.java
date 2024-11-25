@@ -1,6 +1,8 @@
 /* WUGraph.java */
 
 package graph;
+import java.util.HashMap;
+import java.util.LinkedList;
 
 /**
  * The WUGraph class represents a weighted, undirected graph.  Self-edges are
@@ -9,26 +11,39 @@ package graph;
 
 public class WUGraph {
 
+  // This stores the vertex as the key and the Vertex object as the value
+  HashMap<Object, Vertex> vertices;
+  HashMap<Object, Edge> edges;
+
   /**
    * WUGraph() constructs a graph having no vertices or edges.
    *
    * Running time:  O(1).
    */
-  public WUGraph();
+  public WUGraph() {
+    this.vertices = new HashMap<Object, Vertex>();
+    this.edges = new HashMap<Object, Edge>();
+  }
 
   /**
    * vertexCount() returns the number of vertices in the graph.
    *
    * Running time:  O(1).
    */
-  public int vertexCount();
+  public int vertexCount() {
+    int count = vertices.size();
+    return count;
+  }
 
   /**
    * edgeCount() returns the total number of edges in the graph.
    *
    * Running time:  O(1).
    */
-  public int edgeCount();
+  public int edgeCount() {
+    int count = edges.size();
+    return count;
+  }
 
   /**
    * getVertices() returns an array containing all the objects that serve
@@ -42,7 +57,11 @@ public class WUGraph {
    *
    * Running time:  O(|V|).
    */
-  public Object[] getVertices();
+  public Object[] getVertices() {
+    
+    // Turns the HashMap into a Set and then turns it into an Array
+    return vertices.keySet().toArray();
+  }
 
   /**
    * addVertex() adds a vertex (with no incident edges) to the graph.
@@ -51,7 +70,12 @@ public class WUGraph {
    *
    * Running time:  O(1).
    */
-  public void addVertex(Object vertex);
+  public void addVertex(Object vertex) {
+    if (vertices.containsKey(vertex)) {
+      return;
+    }
+    vertices.put(vertex, new Vertex(vertex));
+  }
 
   /**
    * removeVertex() removes a vertex from the graph.  All edges incident on the
@@ -60,7 +84,11 @@ public class WUGraph {
    *
    * Running time:  O(d), where d is the degree of "vertex".
    */
-  public void removeVertex(Object vertex);
+  public void removeVertex(Object vertex) {
+    if (vertices.containsKey(vertex)) {
+      vertices.remove(vertex);
+    }
+  }
 
   /**
    * isVertex() returns true if the parameter "vertex" represents a vertex of
@@ -68,7 +96,12 @@ public class WUGraph {
    *
    * Running time:  O(1).
    */
-  public boolean isVertex(Object vertex);
+  public boolean isVertex(Object vertex) {
+    if (vertices.containsKey(vertex)) {
+      return true;
+    }
+    return false;
+  }
 
   /**
    * degree() returns the degree of a vertex.  Self-edges add only one to the
@@ -77,7 +110,9 @@ public class WUGraph {
    *
    * Running time:  O(1).
    */
-  public int degree(Object vertex);
+  public int degree(Object vertex) {
+    return 0;
+  }
 
   /**
    * getNeighbors() returns a new Neighbors object referencing two arrays.  The
@@ -97,7 +132,9 @@ public class WUGraph {
    *
    * Running time:  O(d), where d is the degree of "vertex".
    */
-  public Neighbors getNeighbors(Object vertex);
+  public Neighbors getNeighbors(Object vertex) {
+    return null;
+  }
 
   /**
    * addEdge() adds an edge (u, v) to the graph.  If either of the parameters
@@ -108,7 +145,9 @@ public class WUGraph {
    *
    * Running time:  O(1).
    */
-  public void addEdge(Object u, Object v, int weight);
+  public void addEdge(Object u, Object v, int weight) {
+    return;
+  }
 
   /**
    * removeEdge() removes an edge (u, v) from the graph.  If either of the
@@ -118,7 +157,9 @@ public class WUGraph {
    *
    * Running time:  O(1).
    */
-  public void removeEdge(Object u, Object v);
+  public void removeEdge(Object u, Object v) {
+    return;
+  }
 
   /**
    * isEdge() returns true if (u, v) is an edge of the graph.  Returns false
@@ -127,7 +168,9 @@ public class WUGraph {
    *
    * Running time:  O(1).
    */
-  public boolean isEdge(Object u, Object v);
+  public boolean isEdge(Object u, Object v) {
+    return true;
+  }
 
   /**
    * weight() returns the weight of (u, v).  Returns zero if (u, v) is not
@@ -143,6 +186,44 @@ public class WUGraph {
    *
    * Running time:  O(1).
    */
-  public int weight(Object u, Object v);
+  public int weight(Object u, Object v) {
+    return 0;
+  }
 
 }
+
+class Vertex {
+  private LinkedList<Edge> edges;
+  private Object data;
+
+  public Vertex(Object data) {
+    this.edges = new LinkedList<>();
+    this.data = data;
+  }
+
+  public void addEdge(Edge edge) {
+    edges.add(edge);
+  }
+
+  public void removeEdge(Edge edge) {
+    edges.remove(edge);
+  }
+ 
+  public LinkedList<Edge> getEdges() {
+    return edges;
+  }
+  
+}
+
+class Edge {
+  Vertex v1;
+  Vertex v2;
+  int weight;
+
+  public Edge(Vertex v1, Vertex v2, int weight) {
+    this.v1 = v1;
+    this.v2 = v2;
+    this.weight = weight;
+  }
+}
+
