@@ -1,7 +1,7 @@
 /* WUGraph.java */
 
 package graph;
-import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.LinkedList;
 
 /**
@@ -12,8 +12,8 @@ import java.util.LinkedList;
 public class WUGraph {
 
   // This stores the vertex as the key and the Vertex object as the value
-  HashMap<Object, Vertex> vertices;
-  HashMap<Object, Edge> edges;
+  Hashtable<Object, Vertex> vertices;
+  Hashtable<Object, Edge> edges;
 
   /**
    * WUGraph() constructs a graph having no vertices or edges.
@@ -21,8 +21,8 @@ public class WUGraph {
    * Running time:  O(1).
    */
   public WUGraph() {
-    this.vertices = new HashMap<Object, Vertex>();
-    this.edges = new HashMap<Object, Edge>();
+    this.vertices = new Hashtable<Object, Vertex>();
+    this.edges = new Hashtable<Object, Edge>();
   }
 
   /**
