@@ -3,6 +3,7 @@
 package graph;
 import java.util.Hashtable;
 import java.util.LinkedList;
+import java.util.ArrayList;
 
 /**
  * The WUGraph class represents a weighted, undirected graph.  Self-edges are
@@ -13,7 +14,8 @@ public class WUGraph {
 
   // This stores the vertex as the key and the Vertex object as the value
   Hashtable<Object, Vertex> vertices;
-  Hashtable<Object, Edge> edges;
+  Hashtable<String, Edge> edges;
+  int edgeNumber;
 
   /**
    * WUGraph() constructs a graph having no vertices or edges.
@@ -22,7 +24,8 @@ public class WUGraph {
    */
   public WUGraph() {
     this.vertices = new Hashtable<Object, Vertex>();
-    this.edges = new Hashtable<Object, Edge>();
+    this.edges = new Hashtable<String, Edge>();
+    this.edgeNumber = 0;
   }
 
   /**
@@ -41,8 +44,7 @@ public class WUGraph {
    * Running time:  O(1).
    */
   public int edgeCount() {
-    int count = edges.size();
-    return count;
+    return edgeNumber;
   }
 
   /**
@@ -58,7 +60,6 @@ public class WUGraph {
    * Running time:  O(|V|).
    */
   public Object[] getVertices() {
-    
     // Turns the HashMap into a Set and then turns it into an Array
     return vertices.keySet().toArray();
   }
@@ -86,6 +87,20 @@ public class WUGraph {
    */
   public void removeVertex(Object vertex) {
     if (vertices.containsKey(vertex)) {
+      Vertex removedVertex= vertices.get(vertex);
+
+      // Iterates through and removes all the edges associated with the vertex
+      LinkedList<Edge> tempEdgeList = new LinkedList<Edge>();
+      for (Edge edge : removedVertex.getEdges()) {
+        tempEdgeList.add(edge);
+      }
+      for (Edge edge : tempEdgeList) {
+        Object u = edge.getV1().getData();
+        Object v = edge.getV2().getData();
+
+        removeEdge(u, v);
+      }
+
       vertices.remove(vertex);
     }
   }
@@ -111,7 +126,11 @@ public class WUGraph {
    * Running time:  O(1).
    */
   public int degree(Object vertex) {
-    return 0;
+    if (!vertices.containsKey(vertex)) {
+      return 0;
+    }
+    Vertex v1 = vertices.get(vertex);
+    return v1.getEdges().size();
   }
 
   /**
@@ -133,7 +152,25 @@ public class WUGraph {
    * Running time:  O(d), where d is the degree of "vertex".
    */
   public Neighbors getNeighbors(Object vertex) {
-    return null;
+    if (!vertices.containsKey(vertex) || vertices.get(vertex).getEdges().size() == 0) {
+      System.out.println(vertex);
+      return null;
+    }
+
+    Neighbors neighborsObject = new Neighbors();
+    Vertex vertex1 = vertices.get(vertex);
+    // Intializes lists
+    neighborsObject.weightList = new int[vertex1.getEdges().size()];
+    neighborsObject.neighborList = new Object[vertex1.getEdges().size()];
+
+    int i =0;
+    for (Edge edge : vertex1.getEdges()) {
+      neighborsObject.weightList[i] = edge.getWeight();
+      neighborsObject.neighborList[i] = edge.getV2().getData();
+      i++;
+    }
+
+    return neighborsObject;
   }
 
   /**
@@ -146,6 +183,41 @@ public class WUGraph {
    * Running time:  O(1).
    */
   public void addEdge(Object u, Object v, int weight) {
+    // Checks to see that the vertices are in the graph
+    if (!vertices.containsKey(u) || !vertices.containsKey(v)) {
+      return;
+    }
+    Vertex vertex1 = vertices.get(u);
+    Vertex vertex2 = vertices.get(v);
+
+    String edgeKey1 = createEdgeKey(u, v);
+    String edgeKey2 = createEdgeKey(v, u);
+
+    // Checks whether the edge already exists
+    if (edges.containsKey(edgeKey1) || edges.containsKey(edgeKey2)) {
+      edges.get(edgeKey1).setWeight(weight);
+      edges.get(edgeKey2).setWeight(weight);
+      return;
+    }
+
+    // If it is a self edge it only adds it to one vertex
+    if (vertex1 == vertex2) {
+      Edge selfEdge = new Edge(vertex1, vertex2, weight);
+      vertex1.getEdges().add(selfEdge);
+      edges.put(edgeKey1, selfEdge);
+    }
+    else { // Creates the edge and adds it to the list of each
+      Edge newEdge1 = new Edge(vertex1, vertex2, weight);
+      vertex1.getEdges().add(newEdge1);
+      edges.put(edgeKey1, newEdge1);
+
+
+      Edge newEdge2 = new Edge(vertex2, vertex1, weight);
+      vertex2.getEdges().add(newEdge2);
+      edges.put(edgeKey2, newEdge2);
+    }
+
+    edgeNumber++;
     return;
   }
 
@@ -158,7 +230,29 @@ public class WUGraph {
    * Running time:  O(1).
    */
   public void removeEdge(Object u, Object v) {
-    return;
+    // Checks to see that the vertices are in the graph
+    if (!vertices.containsKey(u) || !vertices.containsKey(v)) {
+      return;
+    }
+
+    Vertex vertex1 = vertices.get(u);
+    Vertex vertex2 = vertices.get(v);
+
+    String edgeKey1 = createEdgeKey(u, v);
+    String edgeKey2 = createEdgeKey(v, u);
+
+    // If the edges exists it gets deleted from vertex1 vertex2 and edges HashTable
+    if (edges.containsKey(edgeKey1) || edges.containsKey(edgeKey2)) {
+      Edge edge1 = edges.get(edgeKey1);
+      vertex1.removeEdge(edge1);
+      edges.remove(edgeKey1);
+
+      Edge edge2 = edges.get(edgeKey2);
+      vertex2.removeEdge(edge2);
+      edges.remove(edgeKey2);
+
+      edgeNumber--;
+    }
   }
 
   /**
@@ -169,7 +263,20 @@ public class WUGraph {
    * Running time:  O(1).
    */
   public boolean isEdge(Object u, Object v) {
-    return true;
+    // Checks to see that the vertices are in the graph
+    if (!vertices.containsKey(u) || !vertices.containsKey(v)) {
+      return false;
+    }
+    Vertex vertex1 = vertices.get(u);
+    Vertex vertex2 = vertices.get(v);
+
+    String edgeKey1 = createEdgeKey(u, v);
+    String edgeKey2 = createEdgeKey(v, u);
+    
+    if (edges.containsKey(edgeKey1) || edges.containsKey(edgeKey2)) {
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -187,7 +294,27 @@ public class WUGraph {
    * Running time:  O(1).
    */
   public int weight(Object u, Object v) {
+    // Checks to see that the vertices are in the graph
+    if (!vertices.containsKey(u) || !vertices.containsKey(v)) {
+      return 0;
+    }
+
+    Vertex vertex1 = vertices.get(u);
+    Vertex vertex2 = vertices.get(v);
+    
+    String edgeKey = createEdgeKey(u, v);
+
+    // Checks whether the edge is in the graph
+    if (edges.containsKey(edgeKey)) {
+      int weight = edges.get(edgeKey).getWeight();
+      return weight;
+    }
+
     return 0;
+  }
+
+  private String createEdgeKey(Object u, Object v) {
+    return u.toString() + "-" + v.toString();
   }
 
 }
@@ -212,17 +339,57 @@ class Vertex {
   public LinkedList<Edge> getEdges() {
     return edges;
   }
+
+  // Getter for data
+  public Object getData() {
+    return data;
+  }
+
+  // Setter for data
+  public void setData(Object data) {
+    this.data = data;
+  }
   
 }
 
 class Edge {
-  Vertex v1;
-  Vertex v2;
-  int weight;
+  private Vertex v1;
+  private Vertex v2;
+  private int weight;
 
   public Edge(Vertex v1, Vertex v2, int weight) {
     this.v1 = v1;
     this.v2 = v2;
+    this.weight = weight;
+  }
+
+  // Getter for v1
+  public Vertex getV1() {
+    return v1;
+  }
+
+  // Setter for v1
+  public void setV1(Vertex v1) {
+    this.v1 = v1;
+  }
+
+  // Getter for v2
+  public Vertex getV2() {
+    return v2;
+  }
+
+  // Setter for v2
+  public void setV2(Vertex v2) {
+    this.v2 = v2;
+  }
+
+  // Getter for weight
+  public int getWeight() {
+    return weight;
+  }
+
+  // Setter for weight
+  public void setWeight(int weight) {
     this.weight = weight;
   }
 }
