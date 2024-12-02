@@ -1,9 +1,10 @@
 /* WUGraph.java */
+/* By: David Stennet, Biencarlo Villa, Ye Thiha Aung */
 
 package graph;
 import java.util.Hashtable;
 import java.util.LinkedList;
-import java.util.ArrayList;
+
 
 /**
  * The WUGraph class represents a weighted, undirected graph.  Self-edges are

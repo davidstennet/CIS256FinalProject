@@ -1,4 +1,6 @@
 /* Kruskal.java */
+/* By: David Stennet, Biencarlo Villa, Ye Thiha Aung */
+
 
 package graphalg;
 
