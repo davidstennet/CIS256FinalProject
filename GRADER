@@ -1,0 +1,14 @@
+For our WUGraph.java file we used a HashTable to hold the vertices and edges
+
+Vertics:
+The key for vertices is the Object for the vertex and the value is the corresponding Vertex object
+
+Edges:
+The key for edges is a String that constructed using the createEdgeKey() method which takes two Object vertices and puts
+them into a corresponding string that can be used to get a value for an Edge object
+
+--------------------------------------------------------------------------------------------------------------------------
+
+removeVertex() is in O(d) time because it uses one for loop to iterate through all the edges in a vertex and removes them
+
+getVertices() is in O(v) time becaues it uses the keySet method to turn in the HashTable into an array which runs in O(v) time
